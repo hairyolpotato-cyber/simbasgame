@@ -35,7 +35,6 @@
       border: 3px solid #e2b13b;
     }
 
-    /* Верхняя панель */
     .game-header {
       background: linear-gradient(135deg, #ffb347, #e07c1f);
       padding: 10px 15px;
@@ -80,7 +79,6 @@
       transform: translateY(2px);
     }
 
-    /* Игровая область */
     .game-area {
       position: relative;
       background: #267c3a;
@@ -100,72 +98,7 @@
       touch-action: none;
     }
 
-    /* Панель кота внизу — мобильная версия */
-    .cat-panel {
-      position: absolute;
-      bottom: 12px;
-      left: 12px;
-      display: flex;
-      align-items: flex-end;
-      gap: 8px;
-      pointer-events: none;
-      z-index: 20;
-    }
-    .simba-sitting {
-      background: #f0dbb4;
-      border-radius: 40px 40px 25px 25px;
-      padding: 5px 12px 6px 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      box-shadow: 0 5px 0 #a55217;
-      pointer-events: auto;
-      border: 2px solid #ffcd94;
-    }
-    .simba-side {
-      font-size: 48px;
-      filter: drop-shadow(2px 3px 5px rgba(0,0,0,0.3));
-      transition: transform 0.1s;
-      cursor: pointer;
-      transform: scaleX(-1);
-    }
-    .simba-label {
-      font-weight: bold;
-      font-size: 1.1rem;
-      color: #b54300;
-      background: #fff0cc;
-      padding: 3px 10px;
-      border-radius: 30px;
-      box-shadow: inset 0 1px 2px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.1);
-    }
-    .speech-bubble {
-      background: white;
-      color: #d45a00;
-      font-weight: bold;
-      font-size: 0.9rem;
-      padding: 5px 12px;
-      border-radius: 30px;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.2);
-      white-space: nowrap;
-      opacity: 0;
-      transition: opacity 0.1s ease;
-      pointer-events: none;
-      position: relative;
-    }
-    .speech-bubble::before {
-      content: "";
-      position: absolute;
-      bottom: -8px;
-      left: 15px;
-      border-width: 8px 6px 0;
-      border-style: solid;
-      border-color: white transparent transparent;
-    }
-    .speech-bubble.show {
-      opacity: 1;
-    }
-
-    /* Модальное окно — мобильная версия */
+    /* Модальное окно с котом */
     .quiz-overlay {
       position: fixed;
       top: 0;
@@ -195,19 +128,71 @@
       transform: scale(0.9);
       transition: transform 0.2s;
     }
+    .quiz-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      background: #ffe0b5;
+      padding: 8px 20px;
+      border-radius: 60px;
+      display: inline-flex;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .quiz-cat {
+      font-size: 48px;
+      filter: drop-shadow(2px 3px 5px rgba(0,0,0,0.3));
+      transform: scaleX(-1);
+      transition: transform 0.1s;
+    }
+    .quiz-cat-name {
+      font-weight: bold;
+      font-size: 1.3rem;
+      color: #b54300;
+      background: white;
+      padding: 4px 16px;
+      border-radius: 40px;
+    }
     .quiz-card h3 {
-      font-size: 1.5rem;
+      font-size: 1.3rem;
       color: #e56700;
-      margin-bottom: 10px;
+      margin: 10px 0 5px;
     }
     .quiz-sentence {
       font-size: 1.3rem;
       background: #ffefcf;
-      padding: 12px;
+      padding: 14px;
       border-radius: 40px;
       margin: 12px 0;
       font-weight: bold;
       word-break: break-word;
+    }
+    .quiz-sentence span.correct-answer {
+      background: #6fbf4c;
+      padding: 4px 10px;
+      border-radius: 30px;
+      display: inline-block;
+      color: white;
+      font-weight: bold;
+      text-shadow: 0 1px 0 #2c5a1a;
+    }
+    .quiz-sentence span.wrong-answer {
+      background: #e65c4f;
+      padding: 4px 10px;
+      border-radius: 30px;
+      display: inline-block;
+      color: white;
+      text-decoration: line-through;
+    }
+    .quiz-sentence span.blank {
+      background: #ffd966;
+      padding: 4px 10px;
+      border-radius: 30px;
+      display: inline-block;
+      color: #b54300;
+      font-weight: bold;
     }
     .quiz-options {
       display: grid;
@@ -291,10 +276,8 @@
     @media (max-width: 550px) {
       .stats { gap: 10px; padding: 4px 14px; font-size: 0.85rem; }
       .stats span { font-size: 1.1rem; }
-      .simba-side { font-size: 40px; }
-      .simba-label { font-size: 0.9rem; }
-      .speech-bubble { font-size: 0.75rem; white-space: nowrap; }
-      .quiz-card h3 { font-size: 1.3rem; }
+      .quiz-cat { font-size: 38px; }
+      .quiz-cat-name { font-size: 1rem; padding: 3px 12px; }
       .quiz-sentence { font-size: 1.1rem; }
       .quiz-opt { font-size: 1rem; padding: 10px 6px; }
     }
@@ -312,22 +295,17 @@
 
   <div class="game-area">
     <canvas id="duckCanvas" width="1100" height="550" style="width:100%; height:auto; aspect-ratio:1100/550"></canvas>
-    
-    <!-- Кот сидит боком -->
-    <div class="cat-panel">
-      <div class="simba-sitting" id="simbaSitting">
-        <div class="simba-side" id="simbaEmoji">🐱🧡</div>
-        <div class="simba-label">Симба</div>
-      </div>
-      <div class="speech-bubble" id="speechBubble">ляпи-ляп!</div>
-    </div>
   </div>
   <footer>🔫 ТАПНИ ПО УТКЕ! Попадание → Симба спросит предлог. Верный ответ — утка сбита!</footer>
 </div>
 
 <div id="quizModal" class="quiz-overlay">
   <div class="quiz-card">
-    <h3>🐱 Симба спрашивает!</h3>
+    <div class="quiz-header">
+      <div class="quiz-cat" id="quizCatEmoji">🐱🧡</div>
+      <div class="quiz-cat-name">Симба</div>
+    </div>
+    <h3>📖 Вставь правильный предлог</h3>
     <div class="quiz-sentence" id="quizSentence">Загрузка...</div>
     <div class="quiz-options" id="quizOptions"></div>
     <div class="quiz-explain" id="quizExplain">✨ Выбери предлог, и Симба объяснит правило ✨</div>
@@ -361,12 +339,14 @@
     let modalActive = false;
     let waitingForClose = false;
     let currentDuck = null;
+    let currentQuestion = null;
+    let currentCorrectAnswer = "";
+    let userAnswered = false;
     
     // UI
     const ducksHitSpan = document.getElementById('ducksHit');
     const livesSpan = document.getElementById('livesCount');
-    const simbaEmoji = document.getElementById('simbaEmoji');
-    const speechBubble = document.getElementById('speechBubble');
+    const quizCatEmoji = document.getElementById('quizCatEmoji');
     const quizModal = document.getElementById('quizModal');
     const quizSentenceDiv = document.getElementById('quizSentence');
     const quizOptionsDiv = document.getElementById('quizOptions');
@@ -520,52 +500,69 @@
       setTimeout(() => effect.remove(), 200);
     }
     function updateUI() { ducksHitSpan.innerText = ducksHitCount; livesSpan.innerText = lives; }
-    function danceSimba() {
-      simbaEmoji.style.transform = "scaleX(-1) scale(1.2) rotate(8deg)";
-      simbaEmoji.innerText = "🐱💃✨";
-      setTimeout(() => { simbaEmoji.style.transform = "scaleX(-1)"; simbaEmoji.innerText = "🐱🧡"; }, 600);
+    
+    function danceSimbaInModal() {
+      quizCatEmoji.style.transform = "scaleX(-1) scale(1.2) rotate(8deg)";
+      quizCatEmoji.innerText = "🐱💃✨";
+      setTimeout(() => { quizCatEmoji.style.transform = "scaleX(-1)"; quizCatEmoji.innerText = "🐱🧡"; }, 600);
     }
-    function sadSimba() {
-      simbaEmoji.innerText = "😿💔";
-      setTimeout(() => { simbaEmoji.innerText = "🐱🧡"; }, 700);
+    
+    function sadSimbaInModal() {
+      quizCatEmoji.innerText = "😿💔";
+      setTimeout(() => { quizCatEmoji.innerText = "🐱🧡"; }, 700);
     }
-    function showLyapLyap() {
-      speechBubble.classList.remove('show');
-      void speechBubble.offsetWidth;
-      speechBubble.classList.add('show');
-      setTimeout(() => speechBubble.classList.remove('show'), 800);
+    
+    // Отобразить предложение с ВЕРНЫМ предлогом (всегда зеленым)
+    function renderSentenceWithCorrectAnswer(sentence, correctPrep) {
+      return sentence.replace(/___/g, `<span class="correct-answer">${correctPrep}</span>`);
+    }
+    
+    // Отобразить предложение с пропуском (до ответа)
+    function renderSentenceWithBlank(sentence) {
+      return sentence.replace(/___/g, '<span class="blank">______</span>');
     }
     
     function openQuizForDuck(duck) {
       if (modalActive || waitingForClose) return;
       modalActive = true; waitingForClose = false;
+      userAnswered = false;
       gameRunning = false;
       if (animationId) cancelAnimationFrame(animationId);
       animationId = null;
       currentDuck = duck;
-      const q = { ...QUESTIONS[Math.floor(Math.random() * QUESTIONS.length)] };
+      currentQuestion = { ...QUESTIONS[Math.floor(Math.random() * QUESTIONS.length)] };
+      currentCorrectAnswer = currentQuestion.correct;
+      
       const allPreps = ["at", "in", "on", "for", "of", "with", "by", "under", "through", "off", "to", "from"];
-      let others = allPreps.filter(p => p !== q.correct);
+      let others = allPreps.filter(p => p !== currentCorrectAnswer);
       for (let i = others.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [others[i], others[j]] = [others[j], others[i]]; }
-      let opts = [q.correct, ...others.slice(0, 3)];
+      let opts = [currentCorrectAnswer, ...others.slice(0, 3)];
       for (let i = opts.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [opts[i], opts[j]] = [opts[j], opts[i]]; }
-      quizSentenceDiv.innerHTML = q.sentence.replace(/___/g, '<span style="background:#ffd966; padding:0 6px; border-radius:25px;">______</span>');
+      
+      // Показываем предложение с пропуском
+      quizSentenceDiv.innerHTML = renderSentenceWithBlank(currentQuestion.sentence);
       quizOptionsDiv.innerHTML = "";
       quizExplainDiv.innerHTML = "🐱 Выбери предлог! Симба объяснит правило.";
+      
       opts.forEach(opt => {
         const btn = document.createElement('button');
         btn.className = 'quiz-opt';
         btn.innerText = opt;
         btn.addEventListener('click', () => {
           if (waitingForClose) return;
-          const isCorrect = (opt === q.correct);
+          userAnswered = true;
+          const isCorrect = (opt === currentCorrectAnswer);
+          
+          // ВСЕГДА вставляем верный предлог в пропуск (зеленым)
+          quizSentenceDiv.innerHTML = renderSentenceWithCorrectAnswer(currentQuestion.sentence, currentCorrectAnswer);
+          
           if (isCorrect) {
             if (currentDuck) currentDuck.alive = false;
-            ducksHitCount++; updateUI(); danceSimba(); showLyapLyap();
-            quizExplainDiv.innerHTML = `✅ ВЕРНО! «${opt}» — правильно!<br>🐱 ${q.explanation}<br><br>🎉 Утка сбита! Нажми «Продолжить охоту».`;
+            ducksHitCount++; updateUI(); danceSimbaInModal();
+            quizExplainDiv.innerHTML = `✅ ВЕРНО! «${opt}» — правильно!<br>🐱 ${currentQuestion.explanation}<br><br>🎉 Утка сбита! Нажми «Продолжить охоту».`;
           } else {
-            lives--; updateUI(); sadSimba();
-            quizExplainDiv.innerHTML = `❌ НЕВЕРНО! Твой ответ: «${opt}». Правильный: «${q.correct}».<br>🐱 ${q.explanation}<br><br>❤️ Теряешь 1 жизнь! Утка улетела...`;
+            lives--; updateUI(); sadSimbaInModal();
+            quizExplainDiv.innerHTML = `❌ НЕВЕРНО! Твой ответ: «${opt}». Правильный предлог: «${currentCorrectAnswer}».<br>🐱 ${currentQuestion.explanation}<br><br>❤️ Теряешь 1 жизнь! Утка улетела...`;
             if (lives <= 0) {
               quizExplainDiv.innerHTML += `<br><br>💀 ИГРА ОКОНЧЕНА! Нажми «Рестарт», чтобы начать заново. 💀`;
               waitingForClose = true;
@@ -591,11 +588,16 @@
         animationId = null;
         return;
       }
-      if (!waitingForClose) { quizExplainDiv.innerHTML = "🐱 Сначала выбери ответ на вопрос!"; return; }
+      if (!waitingForClose) { 
+        quizExplainDiv.innerHTML = "🐱 Сначала выбери ответ на вопрос!"; 
+        return; 
+      }
       quizModal.classList.remove('visible');
       modalActive = false; waitingForClose = false;
+      userAnswered = false;
       if (lives > 0) { gameRunning = true; startGameLoop(); }
       currentDuck = null;
+      currentQuestion = null;
     }
     
     function restartGame() {
@@ -607,9 +609,8 @@
       ducks = []; initDucks(5);
       gameRunning = true;
       startGameLoop();
-      speechBubble.classList.remove('show');
-      simbaEmoji.innerText = "🐱🧡";
-      simbaEmoji.style.transform = "scaleX(-1)";
+      quizCatEmoji.innerText = "🐱🧡";
+      quizCatEmoji.style.transform = "scaleX(-1)";
     }
     
     function handleCanvasClick(e) {
@@ -639,8 +640,6 @@
           return;
         }
       }
-      simbaEmoji.style.transform = "scaleX(-1) rotate(5deg)";
-      setTimeout(() => simbaEmoji.style.transform = "scaleX(-1)", 150);
     }
     
     canvas.addEventListener('click', handleCanvasClick);
@@ -657,7 +656,7 @@
       animationId = requestAnimationFrame(animate);
     }
     function startGameLoop() { if (animationId) cancelAnimationFrame(animationId); gameRunning = true; animate(); }
-    function initGame() { ducksHitCount = 0; lives = 3; updateUI(); initDucks(5); gameRunning = true; modalActive = false; waitingForClose = false; startGameLoop(); addDuckPeriodically(); simbaEmoji.style.transform = "scaleX(-1)"; }
+    function initGame() { ducksHitCount = 0; lives = 3; updateUI(); initDucks(5); gameRunning = true; modalActive = false; waitingForClose = false; startGameLoop(); addDuckPeriodically(); quizCatEmoji.style.transform = "scaleX(-1)"; }
     initGame();
   })();
 </script>
