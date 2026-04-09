@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>🐱 Симба — Охота на уток: учим английские предлоги</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(145deg, #1b4d1a, #0a2f0f);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Segoe UI', 'Comic Neue', 'Comic Sans MS', 'Chalkboard SE', cursive, sans-serif;
+      padding: 12px;
+      cursor: crosshair;
+      touch-action: manipulation;
+    }
+
+    .game-wrapper {
+      max-width: 100%;
+      width: 100%;
+      background: #2c5a2a;
+      border-radius: 40px;
+      box-shadow: 0 20px 35px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+      border: 3px solid #e2b13b;
+    }
+
+    /* Верхняя панель */
+    .game-header {
+      background: linear-gradient(135deg, #ffb347, #e07c1f);
+      padding: 10px 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 3px solid #ffdd99;
+      flex-wrap: wrap;
+    }
+
+    .stats {
+      display: flex;
+      gap: 15px;
+      background: #2d2b1f;
+      padding: 6px 18px;
+      border-radius: 50px;
+      color: #ffdd99;
+      font-weight: bold;
+      font-size: 1rem;
+    }
+    .stats span {
+      color: #ffbc3c;
+      font-size: 1.3rem;
+      font-weight: bold;
+    }
+    .restart-btn {
+      background: #2d2b1f;
+      border: none;
+      color: #ffdd99;
+      font-size: 1rem;
+      font-weight: bold;
+      padding: 6px 18px;
+      border-radius: 50px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: 0.1s;
+      box-shadow: 0 3px 0 #6b3f00;
+      touch-action: manipulation;
+    }
+    .restart-btn:active {
+      transform: translateY(2px);
+    }
+
+    /* Игровая область */
+    .game-area {
+      position: relative;
+      background: #267c3a;
+      margin: 12px;
+      border-radius: 35px;
+      border: 4px solid #e2b13b;
+      box-shadow: inset 0 0 0 3px #f9e0a0, 0 8px 15px rgba(0,0,0,0.3);
+      overflow: hidden;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      background: radial-gradient(circle at 20% 40%, #4caf50, #1d5a2a);
+      cursor: crosshair;
+      touch-action: none;
+    }
+
+    /* Панель кота внизу — мобильная версия */
+    .cat-panel {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      pointer-events: none;
+      z-index: 20;
+    }
+    .simba-sitting {
+      background: #f0dbb4;
+      border-radius: 40px 40px 25px 25px;
+      padding: 5px 12px 6px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 5px 0 #a55217;
+      pointer-events: auto;
+      border: 2px solid #ffcd94;
+    }
+    .simba-side {
+      font-size: 48px;
+      filter: drop-shadow(2px 3px 5px rgba(0,0,0,0.3));
+      transition: transform 0.1s;
+      cursor: pointer;
+      transform: scaleX(-1);
+    }
+    .simba-label {
+      font-weight: bold;
+      font-size: 1.1rem;
+      color: #b54300;
+      background: #fff0cc;
+      padding: 3px 10px;
+      border-radius: 30px;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .speech-bubble {
+      background: white;
+      color: #d45a00;
+      font-weight: bold;
+      font-size: 0.9rem;
+      padding: 5px 12px;
+      border-radius: 30px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.1s ease;
+      pointer-events: none;
+      position: relative;
+    }
+    .speech-bubble::before {
+      content: "";
+      position: absolute;
+      bottom: -8px;
+      left: 15px;
+      border-width: 8px 6px 0;
+      border-style: solid;
+      border-color: white transparent transparent;
+    }
+    .speech-bubble.show {
+      opacity: 1;
+    }
+
+    /* Модальное окно — мобильная версия */
+    .quiz-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(5px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      visibility: hidden;
+      opacity: 0;
+      transition: 0.2s ease;
+      padding: 16px;
+    }
+    .quiz-card {
+      max-width: 500px;
+      width: 100%;
+      background: #fff9ef;
+      border-radius: 50px;
+      padding: 18px 20px 25px;
+      text-align: center;
+      box-shadow: 0 20px 35px black;
+      border: 4px solid #ffb347;
+      transform: scale(0.9);
+      transition: transform 0.2s;
+    }
+    .quiz-card h3 {
+      font-size: 1.5rem;
+      color: #e56700;
+      margin-bottom: 10px;
+    }
+    .quiz-sentence {
+      font-size: 1.3rem;
+      background: #ffefcf;
+      padding: 12px;
+      border-radius: 40px;
+      margin: 12px 0;
+      font-weight: bold;
+      word-break: break-word;
+    }
+    .quiz-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 12px 0;
+    }
+    .quiz-opt {
+      background: #ffbc6e;
+      border: none;
+      font-size: 1.2rem;
+      font-weight: bold;
+      padding: 12px 8px;
+      border-radius: 40px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: 0.05s linear;
+      box-shadow: 0 4px 0 #9b4b1a;
+      touch-action: manipulation;
+    }
+    .quiz-opt:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 #9b4b1a;
+    }
+    .quiz-opt:disabled {
+      opacity: 0.6;
+      transform: none;
+      cursor: default;
+    }
+    .quiz-explain {
+      background: #ffe1b3;
+      border-radius: 35px;
+      padding: 12px;
+      margin-top: 10px;
+      font-size: 0.9rem;
+      color: #3b2a1f;
+      line-height: 1.4;
+    }
+    .close-quiz {
+      background: #2c7a47;
+      color: white;
+      border: none;
+      font-size: 1.2rem;
+      padding: 10px 18px;
+      border-radius: 50px;
+      margin-top: 12px;
+      cursor: pointer;
+      font-weight: bold;
+      width: 100%;
+      touch-action: manipulation;
+    }
+    .visible {
+      visibility: visible;
+      opacity: 1;
+    }
+    .visible .quiz-card {
+      transform: scale(1);
+    }
+    .shot-effect {
+      position: fixed;
+      width: 30px;
+      height: 30px;
+      pointer-events: none;
+      background: radial-gradient(circle, yellow, orange, red);
+      border-radius: 50%;
+      opacity: 0.8;
+      animation: bang 0.2s ease-out forwards;
+      z-index: 200;
+    }
+    @keyframes bang {
+      0% { transform: scale(0.2); opacity: 1; }
+      100% { transform: scale(2); opacity: 0; }
+    }
+    footer {
+      background: #c77e2a;
+      text-align: center;
+      padding: 8px;
+      color: #fff0b5;
+      font-size: 0.7rem;
+    }
+    @media (max-width: 550px) {
+      .stats { gap: 10px; padding: 4px 14px; font-size: 0.85rem; }
+      .stats span { font-size: 1.1rem; }
+      .simba-side { font-size: 40px; }
+      .simba-label { font-size: 0.9rem; }
+      .speech-bubble { font-size: 0.75rem; white-space: nowrap; }
+      .quiz-card h3 { font-size: 1.3rem; }
+      .quiz-sentence { font-size: 1.1rem; }
+      .quiz-opt { font-size: 1rem; padding: 10px 6px; }
+    }
+  </style>
+</head>
+<body>
+<div class="game-wrapper">
+  <div class="game-header">
+    <div class="stats">
+      <div>🎯 <span id="ducksHit">0</span></div>
+      <div>❤️ <span id="livesCount">3</span></div>
+    </div>
+    <button class="restart-btn" id="restartGameBtn">🔄 Рестарт</button>
+  </div>
+
+  <div class="game-area">
+    <canvas id="duckCanvas" width="1100" height="550" style="width:100%; height:auto; aspect-ratio:1100/550"></canvas>
+    
+    <!-- Кот сидит боком -->
+    <div class="cat-panel">
+      <div class="simba-sitting" id="simbaSitting">
+        <div class="simba-side" id="simbaEmoji">🐱🧡</div>
+        <div class="simba-label">Симба</div>
+      </div>
+      <div class="speech-bubble" id="speechBubble">ляпи-ляп!</div>
+    </div>
+  </div>
+  <footer>🔫 ТАПНИ ПО УТКЕ! Попадание → Симба спросит предлог. Верный ответ — утка сбита!</footer>
+</div>
+
+<div id="quizModal" class="quiz-overlay">
+  <div class="quiz-card">
+    <h3>🐱 Симба спрашивает!</h3>
+    <div class="quiz-sentence" id="quizSentence">Загрузка...</div>
+    <div class="quiz-options" id="quizOptions"></div>
+    <div class="quiz-explain" id="quizExplain">✨ Выбери предлог, и Симба объяснит правило ✨</div>
+    <button class="close-quiz" id="closeQuizBtn">➡️ Продолжить охоту</button>
+  </div>
+</div>
+
+<script>
+  (function() {
+    // БАЗА ВОПРОСОВ
+    const QUESTIONS = [
+      { sentence: "I usually wake up ___ 7 o'clock.", correct: "at", explanation: "AT используется для точного времени: at 7 o'clock, at noon." },
+      { sentence: "She is very good ___ mathematics.", correct: "at", explanation: "GOOD AT — быть хорошим в чём-то." },
+      { sentence: "Let's meet ___ Friday evening.", correct: "on", explanation: "ON — для дней недели: on Friday." },
+      { sentence: "My birthday is ___ December 12th.", correct: "on", explanation: "ON + конкретная дата." },
+      { sentence: "The cat is hiding ___ the sofa.", correct: "under", explanation: "UNDER = под чем-то." },
+      { sentence: "We walked ___ the park.", correct: "through", explanation: "THROUGH = сквозь, через." },
+      { sentence: "He's interested ___ learning Japanese.", correct: "in", explanation: "INTERESTED IN — интересоваться." },
+      { sentence: "I'm waiting ___ my friend.", correct: "for", explanation: "WAIT FOR — ждать кого-то." },
+      { sentence: "This gift is ___ you!", correct: "for", explanation: "FOR — для (назначение)." },
+      { sentence: "The restaurant is ___ the left.", correct: "on", explanation: "ON THE LEFT — слева." }
+    ];
+
+    let canvas = document.getElementById('duckCanvas');
+    let ctx = canvas.getContext('2d');
+    let ducks = [];
+    let ducksHitCount = 0;
+    let lives = 3;
+    let animationId = null;
+    let gameRunning = true;
+    let modalActive = false;
+    let waitingForClose = false;
+    let currentDuck = null;
+    
+    // UI
+    const ducksHitSpan = document.getElementById('ducksHit');
+    const livesSpan = document.getElementById('livesCount');
+    const simbaEmoji = document.getElementById('simbaEmoji');
+    const speechBubble = document.getElementById('speechBubble');
+    const quizModal = document.getElementById('quizModal');
+    const quizSentenceDiv = document.getElementById('quizSentence');
+    const quizOptionsDiv = document.getElementById('quizOptions');
+    const quizExplainDiv = document.getElementById('quizExplain');
+    const closeQuizBtn = document.getElementById('closeQuizBtn');
+    const restartBtn = document.getElementById('restartGameBtn');
+    
+    function resizeCanvas() {
+      const container = canvas.parentElement;
+      const maxWidth = container.clientWidth - 10;
+      let width = Math.min(1100, maxWidth);
+      canvas.width = 1100;
+      canvas.height = 550;
+      canvas.style.width = `${width}px`;
+    }
+    window.addEventListener('resize', () => { resizeCanvas(); });
+    resizeCanvas();
+
+    // УТКА
+    class Duck {
+      constructor(x, y, speedX, speedY) {
+        this.x = x; this.y = y; this.w = 52; this.h = 46;
+        this.speedX = speedX; this.speedY = speedY;
+        this.alive = true; this.flap = 0;
+      }
+      update() {
+        if (!this.alive) return;
+        this.x += this.speedX; this.y += this.speedY;
+        if (this.x < 15) { this.x = 15; this.speedX = -this.speedX; }
+        if (this.x + this.w > canvas.width - 15) { this.x = canvas.width - this.w - 15; this.speedX = -this.speedX; }
+        if (this.y < 20) { this.y = 20; this.speedY = -this.speedY; }
+        if (this.y + this.h > canvas.height - 70) { this.y = canvas.height - this.h - 70; this.speedY = -this.speedY; }
+        this.flap = (this.flap + 0.25) % (Math.PI * 2);
+      }
+      draw(ctx) {
+        if (!this.alive) return;
+        ctx.save();
+        let x = this.x, y = this.y;
+        let wingAngle = Math.sin(this.flap) * 0.7;
+        ctx.beginPath();
+        ctx.ellipse(x + 26, y + 24, 23, 19, 0, 0, Math.PI * 2);
+        ctx.fillStyle = "#8B5A2B"; ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(x + 26, y + 22, 20, 16, 0, 0, Math.PI * 2);
+        ctx.fillStyle = "#A8753A"; ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(x + 18, y + 28, 12, 14, -0.2, 0, Math.PI * 2);
+        ctx.fillStyle = "#D4A76A"; ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(x + 42, y + 12, 15, 14, 0, 0, Math.PI * 2);
+        ctx.fillStyle = "#6B4E2E"; ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(x + 44, y + 10, 12, 11, 0, 0, Math.PI * 2);
+        ctx.fillStyle = "#8B6946"; ctx.fill();
+        ctx.fillStyle = "#000";
+        ctx.beginPath();
+        ctx.arc(x + 48, y + 8, 3, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = "white";
+        ctx.beginPath();
+        ctx.arc(x + 49, y + 6, 1.2, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = "#FF8C42";
+        ctx.beginPath();
+        ctx.moveTo(x + 56, y + 10); ctx.lineTo(x + 66, y + 12); ctx.lineTo(x + 56, y + 16); ctx.fill();
+        ctx.save();
+        ctx.translate(x + 20, y + 24);
+        ctx.rotate(wingAngle * 0.8);
+        ctx.beginPath();
+        ctx.moveTo(0, 0); ctx.quadraticCurveTo(-15, -12, -25, -5); ctx.quadraticCurveTo(-12, 5, 0, 0);
+        ctx.fillStyle = "#A0652A"; ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(-5, 2); ctx.quadraticCurveTo(-18, -6, -22, 0);
+        ctx.fillStyle = "#C67B3A"; ctx.fill();
+        ctx.restore();
+        ctx.beginPath();
+        ctx.moveTo(x + 5, y + 22); ctx.lineTo(x - 8, y + 18); ctx.lineTo(x + 2, y + 28);
+        ctx.fillStyle = "#5E3A1A"; ctx.fill();
+        ctx.restore();
+      }
+      isHit(mx, my) { return (mx >= this.x && mx <= this.x + this.w && my >= this.y && my <= this.y + this.h); }
+    }
+    
+    // ПРИРОДНЫЙ ФОН
+    function drawNatureBackground() {
+      const gradSky = ctx.createLinearGradient(0, 0, 0, canvas.height * 0.6);
+      gradSky.addColorStop(0, "#87CEEB"); gradSky.addColorStop(1, "#B0E0E6");
+      ctx.fillStyle = gradSky; ctx.fillRect(0, 0, canvas.width, canvas.height * 0.65);
+      ctx.beginPath(); ctx.arc(80, 70, 35, 0, Math.PI * 2);
+      ctx.fillStyle = "#FFD966"; ctx.fill();
+      ctx.beginPath(); ctx.arc(80, 70, 28, 0, Math.PI * 2);
+      ctx.fillStyle = "#FFE484"; ctx.fill();
+      ctx.fillStyle = "#FFFFFFCC";
+      ctx.beginPath(); ctx.ellipse(300, 55, 45, 30, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(340, 45, 40, 28, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(260, 48, 38, 26, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(800, 70, 50, 32, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(850, 60, 42, 28, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = "#4A7A2E"; ctx.fillRect(0, canvas.height * 0.58, canvas.width, canvas.height * 0.2);
+      ctx.fillStyle = "#6B8E3A";
+      for (let i = 0; i < 40; i++) {
+        ctx.beginPath();
+        ctx.moveTo(i * 35, canvas.height * 0.58);
+        ctx.lineTo(i * 35 + 12, canvas.height * 0.58 - 18);
+        ctx.lineTo(i * 35 - 12, canvas.height * 0.58 - 18);
+        ctx.fill();
+      }
+      ctx.fillStyle = "#4A90C4"; ctx.fillRect(0, canvas.height * 0.7, canvas.width, canvas.height * 0.3);
+      ctx.fillStyle = "#6AB0E0";
+      for (let i = 0; i < 80; i++) {
+        ctx.beginPath();
+        ctx.ellipse(20 + i * 25, canvas.height * 0.72 + (i % 3) * 6, 12, 5, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      for (let i = 0; i < 25; i++) {
+        let x = 30 + i * 45;
+        ctx.beginPath();
+        ctx.moveTo(x, canvas.height * 0.7);
+        ctx.lineTo(x - 4, canvas.height * 0.7 - 38);
+        ctx.lineTo(x + 4, canvas.height * 0.7 - 38);
+        ctx.fillStyle = "#5C7A2E"; ctx.fill();
+        ctx.fillStyle = "#8B5A2B";
+        ctx.beginPath();
+        ctx.ellipse(x, canvas.height * 0.7 - 42, 6, 12, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    
+    function spawnDuck() {
+      let side = Math.floor(Math.random() * 4);
+      let x, y, speedX, speedY, baseSpeed = 0.9 + Math.random() * 1.5;
+      if (side === 0) { x = -40; y = 60 + Math.random() * (canvas.height - 180); speedX = baseSpeed; speedY = (Math.random() - 0.5) * 1.1; }
+      else if (side === 1) { x = canvas.width + 20; y = 60 + Math.random() * (canvas.height - 180); speedX = -baseSpeed; speedY = (Math.random() - 0.5) * 1.1; }
+      else if (side === 2) { x = 30 + Math.random() * (canvas.width - 100); y = -30; speedX = (Math.random() - 0.5) * 1.2; speedY = baseSpeed; }
+      else { x = 30 + Math.random() * (canvas.width - 100); y = canvas.height - 60; speedX = (Math.random() - 0.5) * 1.2; speedY = -baseSpeed; }
+      speedX = Math.min(Math.max(speedX, -2), 2); speedY = Math.min(Math.max(speedY, -1.6), 1.6);
+      if (Math.abs(speedX) < 0.5 && Math.abs(speedY) < 0.5) { speedX = 1.1; speedY = 0.6; }
+      return new Duck(x, y, speedX, speedY);
+    }
+    
+    function initDucks(count = 5) { ducks = []; for (let i = 0; i < count; i++) ducks.push(spawnDuck()); }
+    function addDuckPeriodically() {
+      if (!gameRunning) return;
+      if (ducks.length < 7 && !modalActive && !waitingForClose) ducks.push(spawnDuck());
+      setTimeout(() => addDuckPeriodically(), 4500 + Math.random() * 2500);
+    }
+    function addShotEffect(x, y) {
+      const effect = document.createElement('div');
+      effect.className = 'shot-effect';
+      effect.style.left = (x - 15) + 'px';
+      effect.style.top = (y - 15) + 'px';
+      document.body.appendChild(effect);
+      setTimeout(() => effect.remove(), 200);
+    }
+    function updateUI() { ducksHitSpan.innerText = ducksHitCount; livesSpan.innerText = lives; }
+    function danceSimba() {
+      simbaEmoji.style.transform = "scaleX(-1) scale(1.2) rotate(8deg)";
+      simbaEmoji.innerText = "🐱💃✨";
+      setTimeout(() => { simbaEmoji.style.transform = "scaleX(-1)"; simbaEmoji.innerText = "🐱🧡"; }, 600);
+    }
+    function sadSimba() {
+      simbaEmoji.innerText = "😿💔";
+      setTimeout(() => { simbaEmoji.innerText = "🐱🧡"; }, 700);
+    }
+    function showLyapLyap() {
+      speechBubble.classList.remove('show');
+      void speechBubble.offsetWidth;
+      speechBubble.classList.add('show');
+      setTimeout(() => speechBubble.classList.remove('show'), 800);
+    }
+    
+    function openQuizForDuck(duck) {
+      if (modalActive || waitingForClose) return;
+      modalActive = true; waitingForClose = false;
+      gameRunning = false;
+      if (animationId) cancelAnimationFrame(animationId);
+      animationId = null;
+      currentDuck = duck;
+      const q = { ...QUESTIONS[Math.floor(Math.random() * QUESTIONS.length)] };
+      const allPreps = ["at", "in", "on", "for", "of", "with", "by", "under", "through", "off", "to", "from"];
+      let others = allPreps.filter(p => p !== q.correct);
+      for (let i = others.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [others[i], others[j]] = [others[j], others[i]]; }
+      let opts = [q.correct, ...others.slice(0, 3)];
+      for (let i = opts.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [opts[i], opts[j]] = [opts[j], opts[i]]; }
+      quizSentenceDiv.innerHTML = q.sentence.replace(/___/g, '<span style="background:#ffd966; padding:0 6px; border-radius:25px;">______</span>');
+      quizOptionsDiv.innerHTML = "";
+      quizExplainDiv.innerHTML = "🐱 Выбери предлог! Симба объяснит правило.";
+      opts.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'quiz-opt';
+        btn.innerText = opt;
+        btn.addEventListener('click', () => {
+          if (waitingForClose) return;
+          const isCorrect = (opt === q.correct);
+          if (isCorrect) {
+            if (currentDuck) currentDuck.alive = false;
+            ducksHitCount++; updateUI(); danceSimba(); showLyapLyap();
+            quizExplainDiv.innerHTML = `✅ ВЕРНО! «${opt}» — правильно!<br>🐱 ${q.explanation}<br><br>🎉 Утка сбита! Нажми «Продолжить охоту».`;
+          } else {
+            lives--; updateUI(); sadSimba();
+            quizExplainDiv.innerHTML = `❌ НЕВЕРНО! Твой ответ: «${opt}». Правильный: «${q.correct}».<br>🐱 ${q.explanation}<br><br>❤️ Теряешь 1 жизнь! Утка улетела...`;
+            if (lives <= 0) {
+              quizExplainDiv.innerHTML += `<br><br>💀 ИГРА ОКОНЧЕНА! Нажми «Рестарт», чтобы начать заново. 💀`;
+              waitingForClose = true;
+              document.querySelectorAll('.quiz-opt').forEach(b => b.disabled = true);
+              return;
+            }
+          }
+          document.querySelectorAll('.quiz-opt').forEach(b => b.disabled = true);
+          waitingForClose = true;
+        });
+        quizOptionsDiv.appendChild(btn);
+      });
+      quizModal.classList.add('visible');
+    }
+    
+    function closeModalAndResume() {
+      if (!modalActive) return;
+      if (lives <= 0) {
+        quizModal.classList.remove('visible');
+        modalActive = false; waitingForClose = false;
+        gameRunning = false;
+        if (animationId) cancelAnimationFrame(animationId);
+        animationId = null;
+        return;
+      }
+      if (!waitingForClose) { quizExplainDiv.innerHTML = "🐱 Сначала выбери ответ на вопрос!"; return; }
+      quizModal.classList.remove('visible');
+      modalActive = false; waitingForClose = false;
+      if (lives > 0) { gameRunning = true; startGameLoop(); }
+      currentDuck = null;
+    }
+    
+    function restartGame() {
+      if (animationId) cancelAnimationFrame(animationId);
+      gameRunning = false; modalActive = false; waitingForClose = false; currentDuck = null;
+      ducksHitCount = 0; lives = 3;
+      updateUI();
+      quizModal.classList.remove('visible');
+      ducks = []; initDucks(5);
+      gameRunning = true;
+      startGameLoop();
+      speechBubble.classList.remove('show');
+      simbaEmoji.innerText = "🐱🧡";
+      simbaEmoji.style.transform = "scaleX(-1)";
+    }
+    
+    function handleCanvasClick(e) {
+      if (!gameRunning || modalActive || waitingForClose) return;
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      let clientX, clientY;
+      if (e.touches) {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+        e.preventDefault();
+      } else {
+        clientX = e.clientX;
+        clientY = e.clientY;
+      }
+      let mouseX = (clientX - rect.left) * scaleX;
+      let mouseY = (clientY - rect.top) * scaleY;
+      if (mouseX < 0 || mouseY < 0 || mouseX > canvas.width || mouseY > canvas.height) return;
+      addShotEffect(clientX, clientY);
+      for (let i = 0; i < ducks.length; i++) {
+        if (ducks[i].alive && ducks[i].isHit(mouseX, mouseY)) {
+          gameRunning = false;
+          if (animationId) cancelAnimationFrame(animationId);
+          animationId = null;
+          openQuizForDuck(ducks[i]);
+          return;
+        }
+      }
+      simbaEmoji.style.transform = "scaleX(-1) rotate(5deg)";
+      setTimeout(() => simbaEmoji.style.transform = "scaleX(-1)", 150);
+    }
+    
+    canvas.addEventListener('click', handleCanvasClick);
+    canvas.addEventListener('touchstart', (e) => { e.preventDefault(); handleCanvasClick(e); }, { passive: false });
+    closeQuizBtn.addEventListener('click', closeModalAndResume);
+    restartBtn.addEventListener('click', restartGame);
+    
+    function animate() {
+      if (!gameRunning) return;
+      drawNatureBackground();
+      for (let duck of ducks) { if (duck.alive) { duck.update(); duck.draw(ctx); } }
+      ducks = ducks.filter(duck => duck.alive);
+      if (ducks.length < 4 && gameRunning && !modalActive && !waitingForClose) ducks.push(spawnDuck());
+      animationId = requestAnimationFrame(animate);
+    }
+    function startGameLoop() { if (animationId) cancelAnimationFrame(animationId); gameRunning = true; animate(); }
+    function initGame() { ducksHitCount = 0; lives = 3; updateUI(); initDucks(5); gameRunning = true; modalActive = false; waitingForClose = false; startGameLoop(); addDuckPeriodically(); simbaEmoji.style.transform = "scaleX(-1)"; }
+    initGame();
+  })();
+</script>
+</body>
+</html>
